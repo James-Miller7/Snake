@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Snake</title>
+</head>
+
+<body>
+  <canvas id="gameCanvas" width="300" height="300">&lt;canvas>
+</body>
+
+</html>
+
+<script>
+  var gameCanvas = document.getElementById("gameCanvas");
+  var ctx = gameCanvas.getContext("2d");
+
+  let snake = [{ x: 150, y: 150 }, { x: 140, y: 150 }, { x: 130, y: 150 }, { x: 120, y: 150 }, { x: 110, y: 150 },];
+
+
+  function drawSnakePart(snakePart) {
+    ctx.fillStyle = 'lightgreen';
+    ctx.strokeStyle = 'darkgreen';
+    ctx.fillRect(snakePart.x, snakePart.y, 10, 10);
+    ctx.strokeRect(snakePart.x, snakePart.y, 10, 10);
+  }
+
+  function drawSnake() {
+    snake.forEach(drawSnakePart);
+  }
+
+  function advanceSnake() {
+    const head = { x: snake[0].x + dx, y: snake[0].y + dy };
+    snake.unshift(head);
+    snake.pop();
+  }
+
+
+  function clearCanvas() {
+    ctx.fillStyle = "white"; ctx.strokeStyle = "black";
+    ctx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+    ctx.strokeRect(0, 0, gameCanvas.width, gameCanvas.height);
+  }
+
+  let dx = 0;
+  let dy = 10;
+  function main() { setTimeout(function onTick() { clearCanvas(); advanceSnake(); drawSnake(); main(); }, 100) }
+
+
+  function up() {
+    dx = 0
+    dy = -10
+  }
+
+  function down() {
+    dx = 0
+    dy = 10
+  }
+
+  function left() {
+    dx = -10
+    dy = 0
+  }
+
+  function right() {
+    dx = 10
+    dy = 0
+  }
+
+  clearCanvas()
+  drawSnake();
+  main();
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "ArrowRight" && dx != -10) {
+      right();
+    }
+    else if (event.key === "ArrowLeft" && dx != 10) {
+      left();
+    }
+    else if (event.key === "ArrowUp") {
+      up()
+    }
+    else if (event.key === "ArrowDown") {
+      down()
+    }
+  });
+
+</script>
