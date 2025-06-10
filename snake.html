@@ -7,7 +7,8 @@
 
 <body>
   <h2 id="scoreHeader">Score: 0</h2>
-  <canvas id="gameCanvas" width="300" height="300">&lt;canvas>
+  <canvas id="gameCanvas" width="300" height="300">
+
 </body>
 
 </html>
@@ -17,7 +18,8 @@
   let ypos = 0;
   let dx = 10;
   let dy = 0;
-  let score = 0
+  let score = 0;
+  let changingDirection = false;
   var gameCanvas = document.getElementById("gameCanvas");
   var ctx = gameCanvas.getContext("2d");
 
@@ -36,6 +38,7 @@
   }
 
   function advanceSnake() {
+    changingDirection = false;
     const head = { x: snake[0].x + dx, y: snake[0].y + dy };
     snake.unshift(head);
     if (snake[0].x === xpos && snake[0].y === ypos) {
@@ -58,7 +61,16 @@
     ctx.strokeRect(0, 0, gameCanvas.width, gameCanvas.height);
   }
 
-  function main() { setTimeout(function onTick() { clearCanvas(); drawFood(); advanceSnake(); drawSnake(); main(); }, 100) }
+  function main() {
+    setTimeout(function onTick() {
+      clearCanvas();
+      if (gameEnd()) {
+        endMessage();
+        return 0;
+      }
+      drawFood(); advanceSnake(); drawSnake(); main();
+    }, 100)
+  }
 
 
   function up() {
@@ -82,6 +94,10 @@
   }
 
   document.addEventListener("keydown", function (event) {
+    if (changingDirection) {
+      return;
+    }
+    changingDirection = true;
     if (event.key === "ArrowRight" && dx != -10) {
       right();
     }
@@ -117,6 +133,27 @@
     ctx.strokeRect(xpos, ypos, 10, 10);
   }
 
+  function gameEnd() {
+    for (let i = 4; i < snake.length; i++) {
+      if (snake[0].x === snake[i].x && snake[0].y === snake[i].y) {
+        return true;
+      }
+    }
+
+    if (snake[0].x < 0 || snake[0].x > 300) {
+      return true;
+    }
+
+    else if (snake[0].y < 0 || snake[0].y > 300) {
+      return true;
+    }
+
+    return false
+  }
+
+  function endMessage() {
+    document.getElementById("scoreHeader").innerText = "GAME OVER FINAL SCORE " + score;
+  }
   clearCanvas()
   drawSnake();
   spawnFood();
