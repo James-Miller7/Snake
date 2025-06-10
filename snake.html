@@ -6,12 +6,18 @@
 </head>
 
 <body>
+  <h2 id="scoreHeader">Score: 0</h2>
   <canvas id="gameCanvas" width="300" height="300">&lt;canvas>
 </body>
 
 </html>
 
 <script>
+  let xpos = 0;
+  let ypos = 0;
+  let dx = 10;
+  let dy = 0;
+  let score = 0
   var gameCanvas = document.getElementById("gameCanvas");
   var ctx = gameCanvas.getContext("2d");
 
@@ -32,9 +38,19 @@
   function advanceSnake() {
     const head = { x: snake[0].x + dx, y: snake[0].y + dy };
     snake.unshift(head);
-    snake.pop();
+    if (snake[0].x === xpos && snake[0].y === ypos) {
+      updateScore();
+      spawnFood();
+    }
+    else {
+      snake.pop();
+    }
   }
 
+  function updateScore() {
+    score += 1
+    document.getElementById("scoreHeader").innerText = "Score: " + score;
+  }
 
   function clearCanvas() {
     ctx.fillStyle = "white"; ctx.strokeStyle = "black";
@@ -42,9 +58,7 @@
     ctx.strokeRect(0, 0, gameCanvas.width, gameCanvas.height);
   }
 
-  let dx = 0;
-  let dy = 10;
-  function main() { setTimeout(function onTick() { clearCanvas(); advanceSnake(); drawSnake(); main(); }, 100) }
+  function main() { setTimeout(function onTick() { clearCanvas(); drawFood(); advanceSnake(); drawSnake(); main(); }, 100) }
 
 
   function up() {
@@ -67,10 +81,6 @@
     dy = 0
   }
 
-  clearCanvas()
-  drawSnake();
-  main();
-
   document.addEventListener("keydown", function (event) {
     if (event.key === "ArrowRight" && dx != -10) {
       right();
@@ -78,12 +88,38 @@
     else if (event.key === "ArrowLeft" && dx != 10) {
       left();
     }
-    else if (event.key === "ArrowUp") {
+    else if (event.key === "ArrowUp" && dy != 10) {
       up()
     }
-    else if (event.key === "ArrowDown") {
+    else if (event.key === "ArrowDown" && dy != -10) {
       down()
     }
   });
+
+  function getRandom(min, max) {
+    return Math.round((Math.random() * (max - min) + min) / 10) * 10;
+  }
+
+  function spawnFood() {
+    xpos = getRandom(0, gameCanvas.width - 10)
+    ypos = getRandom(0, gameCanvas.height - 10)
+
+    snake.forEach(function isFoodOnSnake(part) {
+      if (xpos === part.x && ypos === part.y) {
+        spawnFood();
+      }
+    })
+  }
+
+  function drawFood() {
+    ctx.fillStyle = "red"; ctx.strokeStyle = "red";
+    ctx.fillRect(xpos, ypos, 10, 10);
+    ctx.strokeRect(xpos, ypos, 10, 10);
+  }
+
+  clearCanvas()
+  drawSnake();
+  spawnFood();
+  main();
 
 </script>
